@@ -1,0 +1,117 @@
+# Using FLANN with Python on Mac OSX
+
+Hopefully this guide will help with building FLANN from source, at least on Mac OSX.
+
+[About the author][author]
+
+## Install Homebrew
+
+[Homebrew][brew] allows you to quickly and easily download and install packages like Python with all of their dependencies.  It is something like a package manager, but builds from source.  Users contribute *recipes*, which are scripts to download, configure, and install various software packages.
+
+    $ ruby -e "$(curl -fsSL https://gist.github.com/raw/323731/install_homebrew.rb)"
+
+### Set up the system $PATH variable
+
+Run the following command, and restart your terminal, and try again.  This tells the shell to look in the `/usr/local/bin` directory for any binaries first and foremost (and it is also where `brew` installs them).
+
+    $ echo "export PATH=/usr/local/bin:\$PATH" >> ~/.bash_profile
+
+*Now restart your terminal for the changes to take effect.*
+
+## Install *cmake*, *gfortran*, and *python*
+
+These are all requisites to either build (cmake, gfortran) or run (python) some of the software later on.  Even though Mac OS X come with Python, it is outdated.  This will install the latest version.
+
+    $ brew install cmake gfortran python hdf5
+
+***To verify that everything is installed correctly, restart the terminal, and run***
+
+    $ which python
+
+You must get `/usr/local/bin/python` or something went wrong.
+
+## Download and Install *NumPy*, *SciPy*, *h5py*
+
+- [numpy source from SourceForge][numpy-src]
+- [scipy source from SourceForge][scipy-src]
+    - Note that scipy 0.7.2 is the last version to include scipy.io.numpyio with fread() and fwrite() which are needed by FLANN
+- [h5py source from Google Code][h5py-src]
+
+After extracting, run the install command for each library:
+    
+    $ sudo python setup.py install
+    
+Note that installation will take some time, especially for *scipy*.  You may wish to use the `-q` flag to hide most of the output.
+
+### Verify Installation
+
+    $ python -c 'import numpy'
+    $ python -c 'import scipy'
+    $ python -c 'import h5py'
+
+## Download and Install [FLANN][flann]
+
+FLANN is the library used to cluster our points.  [Flann's documentation][flann-doc] is also available in PDF format.
+
+### Download the FLANN source
+
+[Get the source for version 1.6][flann-src] and unzip it.
+
+### Compile FLANN
+
+The following command will build the *FLANN* libraries, the tests, and then run the tests.  Finally, the FLANN library will be installed.
+
+    $ make libs tests test install
+
+For whatever reason, one of the example fails on my machine, which prevents the installation process from occurring.  If this is happening to you, try this before running the `make` command above:
+
+    $ mv examples examples.bad
+    $ mkdir examples
+
+### Check that PyFlann is installed
+
+    $ python -c 'import pyflann'
+    
+### Run the example PyFlann program from the [documentation][flann-doc]
+
+    from pyflann import *
+    from numpy import *
+    from numpy.random import *
+    dataset = rand(10000, 128)
+    testset = rand(1000, 128)
+    flann = FLANN()
+    result,dists = flann.nn(dataset,testset,5,algorithm="kmeans",
+    branching=32, iterations=7, checks=16)
+
+**Expected output**
+
+    >>> result
+    array([[3356, 3944, 4701, 8097, 8107],
+           [5437, 9628, 3405, 5312,  400],
+           [2097,  284,  694, 5580, 2575],
+           ..., 
+           [9756, 5876, 7851, 6308, 1138],
+           [7640, 5411, 4087, 8471, 1326],
+           [7300, 6778, 1167, 3236, 2173]], dtype=int32)
+    >>> dists
+    array([[ 16.05697441,  16.50231552,  16.61752129,  16.61861038,  16.7336483 ],
+           [ 17.40425873,  17.64507103,  18.40781593,  18.4620533 ,
+             18.65351486],
+           [ 15.90618324,  16.97319221,  17.50084686,  18.37429047,
+             18.42541504],
+           ..., 
+           [ 13.44066715,  14.69883823,  15.04138756,  15.70637131,  16.0527401 ],
+           [ 12.67453766,  13.82318783,  16.00524712,  16.12127304,
+             16.22905159],
+           [ 14.53772354,  15.15403557,  15.25297928,  16.23166656,
+             16.99126625]], dtype=float32)
+
+
+[brew]: https://github.com/mxcl/homebrew/wiki
+[h5py-src]: http://h5py.googlecode.com/files/h5py-1.3.1-beta.tar.gz
+[scipy-src]: http://sourceforge.net/projects/scipy/files/scipy/0.7.2/scipy-0.7.2.tar.gz
+[numpy-src]: http://sourceforge.net/projects/numpy/files/NumPy/1.5.1/numpy-1.5.1.tar.gz
+[flann-src]: http://www.cs.ubc.ca/~mariusm/uploads/FLANN/flann-1.6-src.zip
+[flann-doc]: http://www.cs.ubc.ca/~mariusm/uploads/FLANN/flann_manual-1.6.pdf
+[flann]: http://www.cs.ubc.ca/~mariusm/index.php/FLANN/FLANN
+[author]: https://www.msu.edu/~riggleza/Student_Profile.html
