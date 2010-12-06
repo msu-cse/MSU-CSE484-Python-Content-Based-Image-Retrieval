@@ -1,9 +1,10 @@
-from pyflann import *
-from numpy import *
-from numpy.random import *
-from optparse import OptionParser
-from progressBar import progressBar
-import sys
+"""
+Parses a feature file into an in-memory array suitable for processing by FLANN
+"""
+
+from cbir import *
+
+log = logging.getLogger('cbir.processFeatures')
 
 class FeatureList:
     
@@ -14,19 +15,28 @@ class FeatureList:
     
     def process(self):
         '''Process the features file'''
+        
+        log.debug("Processing %s" % self.filename)
         f = file(self.filename)
+        
+        # -- Create empty dataset.  Note that all of the values are 0-255,
+        # so we can get away with using an unsinged integer to conserve RAM.
         f_length = self.file_len()
         self.dataset = empty((f_length,128), dtype='uint8')
+        log.debug("Created empty dataset with %i rows" % f_length)
+        
+        # -- Processe each row
         lineNo = 0
         for line in f:
+            
             values = [int(x) for x in line.split()]
             length = len(values)
             self.dataset[lineNo] = values
             
-            lineNo += 1
+            if lineNo % 10000 == 0:
+                log.debug("... loaded row %i / %i" % (lineNo,f_length))
             
-            if lineNo % 1000 == 0:
-                print "... %s" % lineNo
+            lineNo += 1
     
     def __repr__(self):
         print "FeatureList('%s')" % self.filename
@@ -41,9 +51,17 @@ class FeatureList:
 
 
 if __name__ == '__main__':
-    optionParser = OptionParser(usage="%prog [file]")
+    optionParser = OptionParser(description=__doc__)
+    optionParser.add_option('-f',
+        dest='feature_file',
+        help="Feature file, e.g. 'esp.feature'")
     (options,args) = optionParser.parse_args()
-    f = FeatureList(args[0])
+    
+    if options.feature_file:
+        f = FeatureList(options.feature_file)
+    else:
+        optionParser.print_help()
+        sys.exit(0)
 
 #   _fields_ = [
 #       ('algorithm', c_int),
