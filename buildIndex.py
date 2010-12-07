@@ -7,7 +7,7 @@ from processFeatures import FeatureList
 
 log = logging.getLogger('cbir.buildIndex')
 
-def buildIndex(featureList):
+def buildIndex(dataset):
     '''
     Builds a FLANN index from the provided FeatureList.
     
@@ -15,7 +15,7 @@ def buildIndex(featureList):
     '''
     # -- Process the file
     flann = FLANN()
-    params = flann.build_index(featureList.dataset,  
+    params = flann.build_index(dataset,  
         algorithm='kdtree',
         trees=8,
         target_precision=-1,
@@ -52,7 +52,7 @@ if __name__ == '__main__':
     
     # -- Process the file
     log.info("Building index...")
-    flann = buildIndex(f)
+    flann = buildIndex(f.dataset)
 
     # -- Save the index to file
     if options.output_file is None:

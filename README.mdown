@@ -1,0 +1,35 @@
+# Using Py-CBIR
+
+MSU Py-CBIR is modularized for easy use.
+
+- processFeatures.py
+    - Processes a feature file into an in-memory array
+- buildIndex.py
+    - Builds an Index from an in-memory array of points, saves it to file
+- cluster.py
+    - Clusters all of the points from an Index and saves those clusters to file
+- bag.py
+    - Loads a feature file and cluster file into memory, determines which cluster each feature belongs to.
+    - Determines which image that feature belongs to, and writes the cluster number to file.
+        - This cluster number is taken from the ordering of the clusters in the cluster file
+        - This list of cluster numbers can be directly used as 'words' in a bag-of-words approach
+        
+## Example Usage
+
+    # Load the first 10 documents' features into their own file, so that 
+    # processing goes faster
+    $ head -n 2158 features/esp.feature > features.first10documents
+    $ FEATURES='features.first10documents'
+    
+    # Build the index
+    $ python buildIndex.py -f $FEATURES -o $FEATURES.index
+    
+    # Find the clusters
+    $ python cluster.py -f $FEATURES -i $FEATURES.index -o $FEATURES.clusters -n 100
+    
+    # Find cluster associations ('words)
+    $ python bag.py -f $FEATURES -c $FEATURES.clusters -d docs -l features/imglist.txt -s features/esp.size
+    
+    # Take a look at the first Image, to see which clusters its points are associated with
+    $ more docs/00004fc7eb4bf00ba434c167890b99fa.txt
+    
