@@ -1,0 +1,175 @@
+# Installing Lemur on Mac OS X 10.6.4 and CSE Systems
+
+[About the author][author]
+
+[author]: https://www.msu.edu/~riggleza/Student_Profile.html
+
+### Everything all at once
+For those of you who just want to copy and paste, here is the quick and dirty.
+
+    # Config for black.cse.msu.edu
+    # Note that you need to be SSH'd in with -X for X11
+    export JAVA_HOME=/soft/linux/jdk16
+    export INSTALL_DIR=/user/cse484/Projects/YOUR_PID/install
+    
+    # Config for Mac OS X users
+    export JAVA_HOME=/System/Library/Frameworks/JavaVM.framework/Home
+    export INSTALL_DIR=$HOME/lemur
+    
+    # Download and extract
+    wget http://goo.gl/oT54
+    tar xvzf lemur-4.12.tar.gz
+    cd lemur-4.12
+    
+    # Configure
+    ./configure --prefix=$INSTALL_DIR --enable-java --with-javahome=$JAVA_HOME
+    
+    # Make.  Try to build everything as fast as possible, then make sure
+    # we got everything.
+    make -j8 # Fast
+    make -j2 # Less fast
+    make     # Anything that got missed
+    
+    # Install
+    make install
+    
+    # Run
+    cd $INSTALL_DIR
+    java -cp share/lemur/lemur.jar -Djava.library.path=lib -jar
+    share/lemur/LemurIndex.jar
+    
+    # Voila.
+
+## Prerequisites
+
+Java is installed by default on all Macs.  No need to download it.  It is also pre-installed on the CSE systems.
+
+    $ java -version
+    java version "1.6.0_20"
+    $ javac -version
+    javac 1.6.0_20
+
+X11 is required in order to run the GUI tools on the remote Linux systems. 
+For OS X 10.5 and up, as well as Linux users, this is supported via the `-X` parameter for `ssh`.  For example:
+
+    ssh -X yourPID@black.cse.msu.edu
+
+Windows users can follow the instructions [here][xming-instructions] to install Xming and Putty, but I have no guarantees:
+
+[xming-instructions]: http://serendip.brynmawr.edu/scienceinsociety/node/38 "XMing Installation Instructions"
+
+## Download the Lemur source
+
+[Download Lemur from SourceForge][lemur-src].  This is the same source for both Linux and Mac.
+
+[lemur-src]: http://sourceforge.net/projects/lemur/files/lemur/lemur-toolkit-4.12/lemur-4.12.tar.gz "Lemur Source"
+
+    $ wget http://goo.gl/oT54
+
+To extract lemur:
+
+    $ tar xvzf lemur-4.12.tar.gz
+    $ cd lemur-4.12
+
+## Configuring and Compiling Lemur
+
+We want to build Lemur with Java enabled.  For some reason, the Lemur `configure` command does not look at the `$JAVA_HOME` environment variable, and you must specify the location of the Java header files with the `--with-javahome` flag (as shown below).
+
+This command will install it into your home directory at `~/lemur`, but if this is the CSE system you will want to use `--prefix=/user/cse484/Projects/yourPID/install` instead.
+
+### Setting $JAVA_HOME
+
+    # black.cse.msu.edu
+    $ export JAVA_HOME=/soft/linux/jdk16
+    
+    # Mac OS X users
+    $ export JAVA_HOME=/System/Library/Frameworks/JavaVM.framework/Home
+    
+    # Make sure that the include files can be found
+    $ ls $JAVA_HOME/include
+    ... jni.h ...
+
+### Configuring Lemur
+
+    $ ./configure --prefix=$HOME/lemur --enable-java --with-javahome=$JAVA_HOME
+
+### Compiling Lemur
+
+The `-j` flag makes it compile files in parallel.  This makes the compilation go much faster.  
+
+You will have to run this command a few times to get everything built, because the way Lemur builds does not necessarily like the parallelism.  You will know that it's done when you see a whole bunch of **Nothing to be done for 'all'**
+
+If you run into issues, remove the `-j` flag and just use `make`
+
+    $ make -j4
+
+Go grab a soda.  This will still take a few minutes.
+
+## Installing Lemur
+
+    $ make install
+    
+You will see a bunch of errors, and 'operation not supported', regarding copying files while preserving the permissions.  This is not a problem, it's just an issue with the way Lemur expects things to happen.
+
+## Running one of the GUI tools
+
+    $ cd $HOME/lemur
+    $ java -cp share/lemur/lemur.jar -Djava.library.path=lib -jar
+    share/lemur/LemurIndex.jar
+    
+### What this Means
+
+- `cp` specifies the Java `classpath`, and tells Java where to look for all of the functionality provided by the Lemur library Jarfile.
+- `-Djava.library.path=lib` tells Java where to look for the Lemur JNI library, `liblemur_jni.jnilib`.  This serves as the interface between the Java and the native C Lemur code.
+
+### Other Utilities
+
+Where are all of the Java GUI files installed?
+
+    $ basename $HOME/lemur/share/lemur/*.jar
+    IndexUI.jar
+    LemurIndex.jar
+    LemurRet.jar
+    RetUI.jar
+    indri.jar
+    ireval.jar
+    irevalGUI.jar
+    jcommon-1.0.14.jar
+    jfreechart-1.0.11.jar
+    lemur.jar
+    
+### What about `RetEval` and all of the non-java files?
+
+They are all in `$HOME/lemur/bin`.
+
+You can make it very convenient to run all of these files from the command line like so:
+
+    echo 'export PATH=$PATH:$HOME/lemur/bin' >> ~/.bash_profile
+
+And restart your terminal or SSH session.  Now you should be able to directly execute the files:
+
+    $ RetEval ...
+    
+# Screenshots
+
+## Running in Mac OS X
+
+![](mac.png)
+
+## Running on Black, via X11 tunneling on Mac OS X
+
+![](black.png)
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-1685543-3']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
