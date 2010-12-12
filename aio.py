@@ -96,7 +96,7 @@ if __name__ == '__main__':
         clusters = clusteringFlann.kmeans(
             pts=featureSet,
             num_clusters=opts.num_clusters,
-            dtype=float32,
+            dtype=uint8,
             max_iterations=opts.num_iterations,
             centers_init='gonzales')
 
