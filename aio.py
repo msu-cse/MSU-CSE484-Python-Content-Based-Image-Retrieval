@@ -75,6 +75,8 @@ if __name__ == '__main__':
     featureSet = pyflann.io.dataset.load(filename=opts.feature_file)
     log.debug("Loaded %s rows" % len(featureSet))
     
+    featureSet = float32(featureSet)
+    
     # -- Calculate the clusters
     # Parameters taken from the project PDF
     clusters = None
@@ -96,11 +98,9 @@ if __name__ == '__main__':
         clusters = clusteringFlann.kmeans(
             pts=featureSet,
             num_clusters=opts.num_clusters,
-            dtype=uint8,
+            dtype=float32,
             max_iterations=opts.num_iterations,
             centers_init='gonzales')
-
-    clusters = uint8(clusters)
 
     # -- Load the clusters into FLANN as if they were the points
     log.info("Building cluster index...")
