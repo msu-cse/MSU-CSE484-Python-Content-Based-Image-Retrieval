@@ -3,7 +3,8 @@ Parses a feature file into an in-memory array suitable for processing by FLANN
 """
 
 from cbir import *
-
+import numpy
+import pyflann
 log = logging.getLogger('cbir.processFeatures')
 
 class FeatureList:
@@ -16,38 +17,11 @@ class FeatureList:
     def process(self):
         '''Process the features file'''
         
-        log.debug("Processing %s" % self.filename)
-        f = file(self.filename)
+        self.dataset = pyflann.io.dataset.load(filename=self.filename)
+        return
         
-        # -- Create empty dataset.  Note that all of the values are 0-255,
-        # so we can get away with using an unsinged integer to conserve RAM.
-        f_length = self.file_len()
-        self.dataset = empty((f_length,128), dtype='uint8')
-        log.debug("Created empty dataset with %i rows" % f_length)
-        
-        # -- Processe each row
-        lineNo = 0
-        for line in f:
-            
-            values = [int(x) for x in line.split()]
-            length = len(values)
-            self.dataset[lineNo] = values
-            
-            if lineNo % 10000 == 0:
-                log.debug("... loaded row %i / %i" % (lineNo,f_length))
-            
-            lineNo += 1
-    
     def __repr__(self):
         print "FeatureList('%s')" % self.filename
-    
-    def file_len(self):
-        '''Returns the length of the file, in lines'''
-        with open(self.filename) as f:
-            for i, l in enumerate(f):
-                pass
-        return i + 1
-    
 
 
 if __name__ == '__main__':

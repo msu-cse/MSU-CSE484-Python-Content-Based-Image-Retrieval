@@ -24,7 +24,7 @@ MSU Py-CBIR is modularized for easy use.
     # Build the index
     $ python buildIndex.py -f $FEATURES -o $FEATURES.index
     
-    # Find the clusters
+    # Find 100 clusters.  Note that the project description requires 125000
     $ python cluster.py -f $FEATURES -i $FEATURES.index -o $FEATURES.clusters -n 100
     
     # Find cluster associations ('words)

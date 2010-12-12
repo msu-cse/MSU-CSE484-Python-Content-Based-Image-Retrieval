@@ -27,6 +27,11 @@ if __name__ == '__main__':
         help="Number of clusters",
         type=int,
         default=150000)
+    optionParser.add_option('-t',
+        dest='num_iterations',
+        help="Number of k-means iterations",
+        type=int,
+        default=15)
     (options,args) = optionParser.parse_args()
     
     # -- Usage
@@ -42,12 +47,14 @@ if __name__ == '__main__':
     
     # -- Load the index
     log.info("Loading the index file...")
-    flann = FLANN()
+    flann = FLANN(log_level='info')
     flann.load_index(options.index_file,f.dataset)
     
     # -- Cluster all of the points
-    log.info("Performing cluster operation")
-    cluster_data = flann.kmeans(f.dataset,options.num_clusters,dtype=uint8)
+    log.info("Clustering into %i clusters, over %i iterations" %
+        (options.num_clusters,options.num_iterations))
+    cluster_data = flann.kmeans(f.dataset,options.num_clusters,dtype=uint8,
+        max_iterations=options.num_iterations)
     
     # -- Save the clusters to file
     set_printoptions(threshold=nan)
