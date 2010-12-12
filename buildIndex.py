@@ -18,9 +18,9 @@ def buildIndex(dataset):
     params = flann.build_index(dataset,  
         algorithm='kdtree',
         trees=8,
-        target_precision=-1,
-        build_weight=0.01,
-        memory_weight=1,
+        target_precision=0.1,
+        build_weight=0.5,
+        memory_weight=0,
         random_seed=-1,
         log_level = "info")
         

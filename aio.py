@@ -72,21 +72,20 @@ if __name__ == '__main__':
 
     # -- Load the feature file
     log.info("Loading features from file...")
-    featureSet = pyflann.io.dataset.load(filename=opts.feature_file)
+    featureSet = float32(pyflann.io.dataset.load(filename=opts.feature_file))
     log.debug("Loaded %s rows" % len(featureSet))
-    
-    featureSet = float32(featureSet)
     
     # -- Calculate the clusters
     # Parameters taken from the project PDF
     clusters = None
+    # clusteringFlann = buildIndex(featureSet)
     clusteringFlann = FLANN(target_precision=1,
-        build_weight=0.01,
-        memory_weight=1,
-        cb_index=0.06,
-        checks=2048,
-        branching=10,
-        log_level='info')
+            build_weight=0.01,
+            memory_weight=1,
+            cb_index=0.06,
+            checks=2048,
+            branching=10,
+            log_level='info')
     
     if exists(opts.cluster_file):
         log.info("Loading clusters from file")

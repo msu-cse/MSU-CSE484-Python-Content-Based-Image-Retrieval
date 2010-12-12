@@ -21,14 +21,18 @@ MSU Py-CBIR is modularized for easy use.
     $ head -n 2158 features/esp.feature > features.first10documents
     $ FEATURES='features.first10documents'
     
+    # Convert the MSU-supplied feature list into a NumPy list that loads much faster
+    $ python txt2npy.py -f $FEATURES
+    
+    
     # Build the index
-    $ python buildIndex.py -f $FEATURES -o $FEATURES.index
+    $ python buildIndex.py -f $FEATURES.npy -o $FEATURES.index
     
     # Find 100 clusters.  Note that the project description requires 125000
-    $ python cluster.py -f $FEATURES -i $FEATURES.index -o $FEATURES.clusters -n 100
+    $ python cluster.py -f $FEATURES.npy -i $FEATURES.index -o $FEATURES.clusters -n 100
     
     # Find cluster associations ('words)
-    $ python bag.py -f $FEATURES -c $FEATURES.clusters -d docs -l features/imglist.txt -s features/esp.size
+    $ python bag.py -f $FEATURES.npy -c $FEATURES.clusters -d docs -l features/imglist.txt -s features/esp.size
     
     # Take a look at the first Image, to see which clusters its points are associated with
     $ more docs/00004fc7eb4bf00ba434c167890b99fa.txt
