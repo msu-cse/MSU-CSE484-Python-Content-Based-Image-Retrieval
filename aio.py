@@ -100,6 +100,8 @@ if __name__ == '__main__':
             max_iterations=opts.num_iterations,
             centers_init='gonzales')
 
+    clusters = uint8(clusters)
+
     # -- Load the clusters into FLANN as if they were the points
     log.info("Building cluster index...")
     clusterIndex = buildIndex(clusters)
