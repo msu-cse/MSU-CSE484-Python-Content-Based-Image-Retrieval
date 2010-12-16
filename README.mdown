@@ -1,3 +1,12 @@
+# Note
+
+This project has been superceded by a C++ variant.  For whatever reason, generating the clusters in Python is obscenely slow.  While I never tested the nearest-neighbor operation, I imagine that it would be as well.  I figure this is Python's fault, not FLANN's.
+
+You can find the new project [here](https://github.com/zachriggle/MSU-CSE484-Content-Based-Image-Retrieval).
+
+
+# ***Old Documentation for Legacy Sake***
+
 # Using Py-CBIR
 
 MSU Py-CBIR is modularized for easy use.
